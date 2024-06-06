@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+.center{
+    @apply text-center;
+}
+@tailwind utilities;
