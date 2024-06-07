@@ -1,10 +1,8 @@
 import React, { useContext } from 'react'
 import musicContext from '../context/context'
-import { useParams } from 'react-router-dom'
 
 const Player = () => {
-    const { playerDets, SecToMin, timeUpdate, isPlaying, playAndPause, volume, setVolume, toggleVolume } = useContext(musicContext)
-    const { id, searchid } = useParams()
+    const { playerDets, SecToMin, timeUpdate, isPlaying, playAndPause, volume, toggleVolume } = useContext(musicContext)
 
     return (
         <div className='absolute bottom-0 flex items-center h-[7rem] w-full p-4 bg-slate-300'>

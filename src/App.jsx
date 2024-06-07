@@ -172,7 +172,7 @@ export default function App() {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/:song/:id' element={<Songdetails />} />
-          <Route path='/:song/search/:searchid' element={<SearchedSongdetails />} />
+          <Route path='/search/:song/:searchid' element={<SearchedSongdetails />} />
         </Routes>
       </BrowserRouter>
     </musicContext.Provider>
