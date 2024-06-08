@@ -44,11 +44,11 @@ const Songdetails = () => {
         <div className='h-[86.8vh] w-[50%] flex items-center justify-center'>
           <div className='text-center w-full h-fit grid place-items-center'>
             <img src={`${songDets[0]?.image[2].url}`} alt="song-image" className='h-[17rem] w-auto object-cover' />
-            <h4 className='mt-[10px] w-full h-fit text-2xl font-semibold'>{songDets[0]?.name.length > 30 ? songDets[0]?.name.slice(0, 30) + '...' : songDets[0]?.name}</h4>
+            <h4 className='mt-[10px] w-full h-fit text-2xl font-semibold'>{songDets[0]?.name.length > 30 ? songDets[0]?.name.slice(0, 30).replace(/&quot;/g, '') + '...' : songDets[0]?.name.replace(/&quot;/g, '')}</h4>
             <h5 className='mt-[5px] w-full h-fit'>
               {songDets[0]?.artists.all.map((artist) => artist.name).join(",").length > 100 ?
-                songDets[0]?.artists.all.map((artist) => artist.name).join(",").slice(0, 100) + "..." :
-                songDets[0]?.artists.all.map((artist) => artist.name).join(",")}
+                songDets[0]?.artists.all.map((artist) => artist.name).join(",").slice(0, 100).replace(/&quot;/g, '') + "..." :
+                songDets[0]?.artists.all.map((artist) => artist.name).join(",").replace(/&quot;/g, '')}
             </h5>
             <h6 className='mt-[2px] w-full h-fit'>{SecToMin(songDets[0]?.duration)} Minutes</h6>
             <button onClick={() => { playMusic(decodeId(searchid)) }} className='bg-[#1ECCB0] py-4 px-12 mt-6 rounded-full text-white font-medium text-xl cursor-pointer'>

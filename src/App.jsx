@@ -140,6 +140,7 @@ export default function App() {
     setVolume(!volume);
   }
 
+
   const fetchSongById = async (id) => {
     const song = await fetch(`https://saavn.dev/api/songs/${id}`);
     const { data } = await song.json();
@@ -166,7 +167,8 @@ export default function App() {
       searchedSong,
       setSearchedSong,
       searchInput,
-      setSearchInput
+      setSearchInput,
+      currentSong
     }}>
       <BrowserRouter>
         <Routes>
