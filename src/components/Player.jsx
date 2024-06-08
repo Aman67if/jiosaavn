@@ -48,7 +48,7 @@ const Player = () => {
 
     return (
         <div className='absolute bottom-0 flex items-center h-[7rem] w-full p-4 bg-slate-300'>
-            <input type="range" ref={progressRef} onMouseDown={startSeeking} onMouseMove={continueSeeking} onMouseUp={endSeeking} min={0} max={100} step={0.1} className='absolute top-[-5px] w-[97%] h-[13px]' />
+            <input type="range" ref={progressRef} onMouseDown={startSeeking} onMouseMove={continueSeeking} onMouseUp={endSeeking} onTouchStart={startSeeking} onTouchMove={continueSeeking} onTouchEnd={endSeeking} min={0} max={100} step={0.1} className='absolute top-[-5px] w-[97%] h-[13px]' />
             <div className='absolute bottom-4 flex items-center gap-4'>
                 <img src={`${playerDets ? playerDets?.image[1].url : "../playerimage.svg"}`} alt="song-image" className='h-20 w-auto object-cover' />
                 <div>
