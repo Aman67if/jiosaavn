@@ -1,14 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Songdetails from './pages/Songdetails';
-import SearchedSongdetails from './pages/SearchedSongDetails';
+import SearchedSongDetails from './pages/SearchedSongDetails';
 import Home from './pages/Home';
 import musicContext from './context/context';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Buffer } from 'buffer';
 
 export default function App() {
   const [songDets, setSongDets] = useState([]);
   const [searchedSong, setSearchedSong] = useState([])
+  const [suggestions, setSuggestions] = useState([]);
   const [currentSong, setCurrentSong] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerDets, setPlayerDets] = useState(null)
@@ -140,11 +141,68 @@ export default function App() {
     setVolume(!volume);
   }
 
-
   const fetchSongById = async (id) => {
     const song = await fetch(`https://saavn.dev/api/songs/${id}`);
     const { data } = await song.json();
     setSongDets(data);
+  }
+
+  const prevSong = async () => {
+    if (currentSong) {
+      const index = suggestions.findIndex((song) => song.id === currentSong.id);
+      if (index == 0) {
+        currentSong.audio.pause();
+        const { id } = suggestions[suggestions.length-1];
+        const newAudio = new Audio(suggestions[suggestions.length-1].downloadUrl[4].url);
+        setCurrentSong({ id, audio: newAudio })
+        setPlayerDets(suggestions[suggestions.length-1]);
+        await fetchSongById(suggestions[suggestions.length-1].id)
+        setupAudioEvents(newAudio);
+        setIsPlaying(true);
+        await newAudio.play();
+      } else {
+        if (index >= 0) {
+          const { id } = suggestions[index - 1];
+          currentSong.audio.pause();
+          const newAudio = new Audio(suggestions[index - 1].downloadUrl[4].url);
+          setCurrentSong({ id, audio: newAudio })
+          setPlayerDets(suggestions[index - 1]);
+          await fetchSongById(suggestions[index - 1].id)
+          setupAudioEvents(newAudio);
+          setIsPlaying(true);
+          await newAudio.play();
+         }
+      }
+    }
+  }
+
+  const nextSong = async () => {
+    if (currentSong) {
+      const index = suggestions.findIndex((song) => song.id === currentSong.id);
+      if (index == suggestions.length - 1 || index == -1) {
+        currentSong.audio.pause();
+        const { id } = suggestions[0];
+        const newAudio = new Audio(suggestions[0].downloadUrl[4].url);
+        setCurrentSong({ id, audio: newAudio })
+        setPlayerDets(suggestions[0]);
+        await fetchSongById(suggestions[0].id)
+        setupAudioEvents(newAudio);
+        setIsPlaying(true);
+        await newAudio.play();
+      } else {
+        if (index >= 0) {
+          const { id } = suggestions[index + 1];
+          currentSong.audio.pause();
+          const newAudio = new Audio(suggestions[index + 1].downloadUrl[4].url);
+          setCurrentSong({ id, audio: newAudio })
+          setPlayerDets(suggestions[index + 1]);
+          await fetchSongById(suggestions[index + 1].id)
+          setupAudioEvents(newAudio);
+          setIsPlaying(true);
+          await newAudio.play();
+         }
+      }
+    }
   }
 
   return (
@@ -168,13 +226,17 @@ export default function App() {
       setSearchedSong,
       searchInput,
       setSearchInput,
-      currentSong
+      currentSong,
+      suggestions,
+      setSuggestions,
+      nextSong,
+      prevSong
     }}>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/:song/:id' element={<Songdetails />} />
-          <Route path='/search/:song/:searchid' element={<SearchedSongdetails />} />
+          <Route path='/search/:song/:searchid' element={<SearchedSongDetails />} />
         </Routes>
       </BrowserRouter>
     </musicContext.Provider>

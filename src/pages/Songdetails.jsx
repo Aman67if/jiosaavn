@@ -7,13 +7,14 @@ import Navbar from '../components/Navbar';
 import SearchedSongsContainer from '../components/SearchedSongsContainer';
 
 const Songdetails = () => {
-  const [suggestions, setSuggestions] = useState([]);
   const {
     SecToMin,
     fetchSongById,
     songDets,
     decodeId,
-    playMusic } = useContext(musicContext);
+    playMusic,
+    suggestions,
+    setSuggestions } = useContext(musicContext);
 
   const { id } = useParams();
 
@@ -27,7 +28,6 @@ const Songdetails = () => {
 
   useEffect(() => {
     fetchSongById(`${decodeId(id)}`);
-    // getSongSuggestions();
   }, [id])
 
   useEffect(() => {
