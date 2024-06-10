@@ -3,7 +3,7 @@ import Songdetails from './pages/Songdetails';
 import SearchedSongDetails from './pages/SearchedSongDetails';
 import Home from './pages/Home';
 import musicContext from './context/context';
-import { useEffect, useRef, useState } from 'react';
+import {  useEffect, useRef, useState } from 'react';
 import { Buffer } from 'buffer';
 
 export default function App() {
@@ -12,7 +12,6 @@ export default function App() {
   const [suggestions, setSuggestions] = useState([]);
   const [currentSong, setCurrentSong] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playerDets, setPlayerDets] = useState(null)
   const [timeUpdate, setTimeUpdate] = useState(null)
   const [volume, setVolume] = useState(true)
   const [isBuffering, setIsBuffering] = useState(false)
@@ -44,21 +43,25 @@ export default function App() {
       if (currentTime == duration) {
         setIsPlaying(false)
       }
-    })
+    });
 
     audio.addEventListener('waiting', () => {
       setIsBuffering(true);
       handleStall(audio);
-    })
+    });
 
     audio.addEventListener('playing', () => {
       setIsBuffering(false);
       clearRetryInterval();
-    })
+    });
+
+    audio.addEventListener('ended', async () => {
+      await nextSong();
+    });
 
     audio.addEventListener('error', () => {
       handleStall(audio);
-    })
+    });
 
     audio.addEventListener('canplaythrough', () => {
       if (!isPlaying && currentSong && currentSong.audio.currentTime > 0) {
@@ -66,7 +69,7 @@ export default function App() {
         setIsPlaying(true);
         clearRetryInterval();
       }
-    })
+    });
   }
 
   const handleStall = (audio) => {
@@ -81,7 +84,7 @@ export default function App() {
         }
       }, 2000);
     }
-  }
+  };
 
   const clearRetryInterval = () => {
     if (retryIntervalRef.current) {
@@ -91,119 +94,76 @@ export default function App() {
     }
   };
 
-  const playMusic = async (id) => {
+  const playAndPause = async (id, name, artists, image, song, duration) => {
     if (currentSong && currentSong.id === id) {
-      currentSong.audio.play();
-      setIsPlaying(true);
+      if (isPlaying) {
+        currentSong.audio.pause();
+        setIsPlaying(false);
+      } else {
+        currentSong.audio.play();
+        setIsPlaying(true);
+      }
     } else {
       if (currentSong) {
         currentSong.audio.pause();
         setIsPlaying(false);
       }
-      const newAudio = new Audio(songDets[0].downloadUrl[4].url);
-      setCurrentSong({ id, audio: newAudio })
-      setPlayerDets(songDets[0]);
-      setupAudioEvents(newAudio);
+      const newAudio = new Audio(song[4].url);
+      setCurrentSong({ id, name, artists, image, audio: newAudio, duration })
       setIsPlaying(true);
+      fetchSongById(id);
+      setupAudioEvents(newAudio);
       await newAudio.play();
     }
-  }
-
-  const playAndPause = async (id) => {
-    if (!playerDets) {
-
-    } else {
-      if (currentSong && currentSong.id === id) {
-        if (isPlaying) {
-          currentSong.audio.pause();
-          setIsPlaying(false);
-        } else {
-          currentSong.audio.play();
-          setIsPlaying(true);
-        }
-      } else {
-        if (currentSong) {
-          currentSong.audio.pause();
-          setIsPlaying(false);
-        }
-        const newAudio = new Audio(playerDets?.downloadUrl[4].url);
-        setCurrentSong({ id, audio: newAudio })
-        setIsPlaying(true);
-        await newAudio.play();
-      }
-    }
-  }
+  };
 
   const toggleVolume = () => {
     if (currentSong) {
       currentSong.audio.volume = volume ? 0 : 1;
     }
     setVolume(!volume);
-  }
+  };
 
   const fetchSongById = async (id) => {
     const song = await fetch(`https://saavn.dev/api/songs/${id}`);
     const { data } = await song.json();
     setSongDets(data);
-  }
+  };
 
   const prevSong = async () => {
     if (currentSong) {
       const index = suggestions.findIndex((song) => song.id === currentSong.id);
       if (index == 0) {
         currentSong.audio.pause();
-        const { id } = suggestions[suggestions.length-1];
-        const newAudio = new Audio(suggestions[suggestions.length-1].downloadUrl[4].url);
-        setCurrentSong({ id, audio: newAudio })
-        setPlayerDets(suggestions[suggestions.length-1]);
-        await fetchSongById(suggestions[suggestions.length-1].id)
-        setupAudioEvents(newAudio);
-        setIsPlaying(true);
-        await newAudio.play();
+        const { id, name, artists, image, downloadUrl, duration } = suggestions[suggestions.length - 1];
+        await playAndPause(id, name, artists, image, downloadUrl, duration);
       } else {
         if (index >= 0) {
-          const { id } = suggestions[index - 1];
           currentSong.audio.pause();
-          const newAudio = new Audio(suggestions[index - 1].downloadUrl[4].url);
-          setCurrentSong({ id, audio: newAudio })
-          setPlayerDets(suggestions[index - 1]);
-          await fetchSongById(suggestions[index - 1].id)
-          setupAudioEvents(newAudio);
-          setIsPlaying(true);
-          await newAudio.play();
-         }
+          const { id, name, artists, image, downloadUrl, duration } = suggestions[index - 1];
+          await playAndPause(id, name, artists, image, downloadUrl, duration);
+        }
       }
     }
-  }
+  };
 
   const nextSong = async () => {
     if (currentSong) {
       const index = suggestions.findIndex((song) => song.id === currentSong.id);
       if (index == suggestions.length - 1 || index == -1) {
         currentSong.audio.pause();
-        const { id } = suggestions[0];
-        const newAudio = new Audio(suggestions[0].downloadUrl[4].url);
-        setCurrentSong({ id, audio: newAudio })
-        setPlayerDets(suggestions[0]);
-        await fetchSongById(suggestions[0].id)
-        setupAudioEvents(newAudio);
-        setIsPlaying(true);
-        await newAudio.play();
+        const { id, name, artists, image, downloadUrl, duration } = suggestions[0];
+        await playAndPause(id, name, artists, image, downloadUrl, duration);
       } else {
         if (index >= 0) {
-          const { id } = suggestions[index + 1];
           currentSong.audio.pause();
-          const newAudio = new Audio(suggestions[index + 1].downloadUrl[4].url);
-          setCurrentSong({ id, audio: newAudio })
-          setPlayerDets(suggestions[index + 1]);
-          await fetchSongById(suggestions[index + 1].id)
-          setupAudioEvents(newAudio);
-          setIsPlaying(true);
-          await newAudio.play();
-         }
+          const { id, name, artists, image, downloadUrl, duration } = suggestions[index + 1];
+          await playAndPause(id, name, artists, image, downloadUrl, duration);
+        }
       }
     }
-  }
+  };
+  
 
   return (
     <musicContext.Provider value={{
@@ -216,9 +176,7 @@ export default function App() {
       playAndPause,
       isPlaying,
       setIsPlaying,
-      playerDets,
       timeUpdate,
-      playMusic,
       volume,
       setVolume,
       toggleVolume,

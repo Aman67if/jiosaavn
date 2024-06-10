@@ -13,7 +13,6 @@ const Songdetails = () => {
     fetchSongById,
     songDets,
     decodeId,
-    playMusic,
     suggestions,
     setSuggestions } = useContext(musicContext);
 
@@ -47,9 +46,6 @@ const Songdetails = () => {
                 songDets[0]?.artists.all.map((artist) => artist.name).join(",").replace(/&quot;/g, '')}
             </h5>
             <h6 className='mt-[2px] w-full h-fit'>{SecToMin(songDets[0]?.duration)} Minutes</h6>
-            <button onClick={() => { playMusic(decodeId(searchid)) }} className='bg-[#1ECCB0] py-4 px-12 mt-6 rounded-full text-white font-medium text-xl cursor-pointer'>
-              Play
-            </button>
           </div>
         </div>
 
