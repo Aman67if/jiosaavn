@@ -14,21 +14,13 @@ const Songdetails = () => {
     songDets,
     decodeId,
     suggestions,
-    setSuggestions } = useContext(musicContext);
+    getSongSuggestions } = useContext(musicContext);
 
   const { searchid } = useParams();
 
-  const getSongSuggestions = async () => {
-    const limit = 14;
-    const offset = 0;
-    const suggestedSongs = await fetch(`https://saavn.dev/api/songs/${decodeId(searchid)}/suggestions?limit=${limit}&offset=${offset}`);
-    const { data } = await suggestedSongs.json();
-    setSuggestions(data);
-  }
-
   useEffect(() => {
     fetchSongById(`${decodeId(searchid)}`);
-    getSongSuggestions();
+    getSongSuggestions(`${decodeId(searchid)}`);
   }, [searchid])
 
   return (

@@ -3,7 +3,7 @@ import Songdetails from './pages/Songdetails';
 import SearchedSongDetails from './pages/SearchedSongDetails';
 import Home from './pages/Home';
 import musicContext from './context/context';
-import {  useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Buffer } from 'buffer';
 
 export default function App() {
@@ -31,6 +31,14 @@ export default function App() {
       const formattedSecs = String(remainSecs).padStart(2, '0');
       return `${formattedMin}:${formattedSecs}`;
     }
+  }
+
+  const getSongSuggestions = async (id) => {
+    const limit = 60;
+    const offset = 0;
+    const suggestedSongs = await fetch(`https://saavn.dev/api/songs/${id}/suggestions?limit=${limit}&offset=${offset}`);
+    const { data } = await suggestedSongs.json();
+    setSuggestions(data);
   }
 
   const setupAudioEvents = (audio) => {
@@ -163,7 +171,7 @@ export default function App() {
       }
     }
   };
-  
+
 
   return (
     <musicContext.Provider value={{
@@ -188,7 +196,8 @@ export default function App() {
       suggestions,
       setSuggestions,
       nextSong,
-      prevSong
+      prevSong,
+      getSongSuggestions
     }}>
       <BrowserRouter>
         <Routes>
