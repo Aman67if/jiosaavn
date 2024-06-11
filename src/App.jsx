@@ -145,12 +145,10 @@ export default function App() {
         currentSong.audio.pause();
         const { id, name, artists, image, downloadUrl, duration } = suggestions[suggestions.length - 1];
         await playAndPause(id, name, artists, image, downloadUrl, duration);
-      } else {
-        if (index >= 0) {
-          currentSong.audio.pause();
-          const { id, name, artists, image, downloadUrl, duration } = suggestions[index - 1];
-          await playAndPause(id, name, artists, image, downloadUrl, duration);
-        }
+      } else if (index >= 0) {
+        currentSong.audio.pause();
+        const { id, name, artists, image, downloadUrl, duration } = suggestions[index - 1];
+        await playAndPause(id, name, artists, image, downloadUrl, duration);
       }
     }
   };
@@ -162,12 +160,10 @@ export default function App() {
         currentSong.audio.pause();
         const { id, name, artists, image, downloadUrl, duration } = suggestions[0];
         await playAndPause(id, name, artists, image, downloadUrl, duration);
-      } else {
-        if (index >= 0) {
-          currentSong.audio.pause();
-          const { id, name, artists, image, downloadUrl, duration } = suggestions[index + 1];
-          await playAndPause(id, name, artists, image, downloadUrl, duration);
-        }
+      } else if (index >= 0) {
+        currentSong.audio.pause();
+        const { id, name, artists, image, downloadUrl, duration } = suggestions[index + 1];
+        await playAndPause(id, name, artists, image, downloadUrl, duration);
       }
     }
   };
