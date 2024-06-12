@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import musicContext from '../context/context'
 
 const Player = () => {
-    const { SecToMin, timeUpdate, isPlaying, playAndPause, volume, toggleVolume, currentSong, songDets, nextSong, prevSong } = useContext(musicContext)
+    const { SecToMin, isPlaying, playAndPause, volume, toggleVolume, currentSong, songDets, nextSong, prevSong} = useContext(musicContext)
     const progressRef = useRef(0)
     const [isSeeking, setIsSeeking] = useState(false)
 
@@ -18,9 +18,11 @@ const Player = () => {
             }
 
             currentSong.audio.addEventListener('timeupdate', timeUpdate);
+            currentSong.audio.addEventListener('ended', nextSong);
 
             return () => {
                 currentSong.audio.removeEventListener('timeupdate', timeUpdate);
+                currentSong.audio.removeEventListener('ended', nextSong);
             }
         }
 
@@ -67,7 +69,7 @@ const Player = () => {
                 <img src="/next.svg" onClick={() => { nextSong() }} alt="next" className='h-12 cursor-pointer' />
             </div>
             <div className='absolute right-3 flex items-center w-fit h-fit gap-4'>
-                <h4>{`${SecToMin(timeUpdate) + ' / ' + SecToMin(currentSong?.duration)}`}</h4>
+                <h4>{`${SecToMin(currentSong?.audio.currentTime) + ' / ' + SecToMin(currentSong?.duration)}`}</h4>
                 <img src="/download.svg" alt="download" className='h-9 cursor-pointer' />
                 <img src={volume ? "/volume.svg" : "/mute.svg"} alt="volume" onClick={() => { toggleVolume() }} className='h-9 cursor-pointer' />
                 <input type="range" min="0" max="100" className='hidden' />

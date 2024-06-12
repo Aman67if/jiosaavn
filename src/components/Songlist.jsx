@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 
 
 const Songlist = ({ id, name, artists, image, downloadUrl, duration }) => {
-  const { SecToMin } = useContext(musicContext);
-  const { playAndPause, encodeId } = useContext(musicContext);
+  const { SecToMin, playAndPause, encodeId } = useContext(musicContext);
 
   return (
     <Link to={`/${name}/${encodeId(id)}`} onClick={() => { playAndPause(id, name, artists, image, downloadUrl, duration) }} className='bg-gray-200 mt-4 w-[94%] flex items-center justify-between px-4 py-2 border-[2px] border-black rounded-2xl cursor-pointer'>
