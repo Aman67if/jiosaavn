@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Player = () => {
-    const { SecToMin, isPlaying, playAndPause, volume, toggleVolume, currentSong, songDets, nextSong, prevSong, loop, setLoop, shuffle, setShuffle } = useContext(musicContext);
+    const { SecToMin, isPlaying, playAndPause, volume, toggleVolume, changeVolume, currentSong, songDets, nextSong, prevSong, loop, setLoop, shuffle, setShuffle } = useContext(musicContext);
     const progressRef = useRef(0);
     const [isSeeking, setIsSeeking] = useState(false);
     const [timeupdate, setTimeupdate] = useState(null);
@@ -122,8 +122,8 @@ const Player = () => {
                 <img src={isPlaying ? "/pause.svg" : "/play.svg"} onClick={() => { playAndPause(songDets[0].id, songDets[0].name, songDets[0].artists, songDets[0].image, songDets[0].downloadUrl, songDets[0].duration) }} alt="play" className='h-12 cursor-pointer' />
                 <img src="/next.svg" onClick={() => { nextSong() }} alt="next" className='h-12 cursor-pointer' />
                 <svg onClick={() => songLoop()} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='h-10' color={`${loop ? "#1FCCB3" : "#000"}`} fill="none">
-                    <path d="M16.3884 3L17.3913 3.97574C17.8393 4.41165 18.0633 4.62961 17.9844 4.81481C17.9056 5 17.5888 5 16.9552 5H9.19422C5.22096 5 2 8.13401 2 12C2 13.4872 2.47668 14.8662 3.2895 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M7.61156 21L6.60875 20.0243C6.16074 19.5883 5.93673 19.3704 6.01557 19.1852C6.09441 19 6.4112 19 7.04478 19H14.8058C18.779 19 22 15.866 22 12C22 10.5128 21.5233 9.13383 20.7105 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M16.3884 3L17.3913 3.97574C17.8393 4.41165 18.0633 4.62961 17.9844 4.81481C17.9056 5 17.5888 5 16.9552 5H9.19422C5.22096 5 2 8.13401 2 12C2 13.4872 2.47668 14.8662 3.2895 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M7.61156 21L6.60875 20.0243C6.16074 19.5883 5.93673 19.3704 6.01557 19.1852C6.09441 19 6.4112 19 7.04478 19H14.8058C18.779 19 22 15.866 22 12C22 10.5128 21.5233 9.13383 20.7105 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M13 15L13 9.31633C13 9.05613 12.7178 8.90761 12.52 9.06373L11 10.2636" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             </div>
@@ -131,7 +131,7 @@ const Player = () => {
                 <h4>{`${SecToMin(timeupdate) + ' / ' + SecToMin(currentSong?.duration)}`}</h4>
                 <img src="/download.svg" alt="download" onClick={() => songDownload()} className='h-9 cursor-pointer' />
                 <img src={volume ? "/volume.svg" : "/mute.svg"} alt="volume" onClick={() => { toggleVolume() }} className='h-9 cursor-pointer' />
-                <input type="range" min="0" max="100" className='hidden' />
+                <input onChange={(e) => {changeVolume(e)}} type="range" min={0} max={1} step={0.01} className='h-2 top-[-5rem] right-[-2.5rem] hidden lg:block' />
             </div>
         </div>
     )

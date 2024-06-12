@@ -120,6 +120,13 @@ export default function App() {
     setVolume(!volume);
   };
 
+  const changeVolume = (e) => {
+    if(currentSong){
+      currentSong.audio.volume = e.target.value;
+      console.log(currentSong.audio.volume)
+    }
+  };
+
   const fetchSongById = async (id) => {
     const song = await fetch(`https://saavn.dev/api/songs/${id}`);
     const { data } = await song.json();
@@ -181,8 +188,8 @@ export default function App() {
       isPlaying,
       setIsPlaying,
       volume,
-      setVolume,
       toggleVolume,
+      changeVolume,
       searchedSong,
       setSearchedSong,
       searchInput,
