@@ -7,15 +7,17 @@ import { useRef, useState } from 'react';
 import { Buffer } from 'buffer';
 
 export default function App() {
+  const retryIntervalRef = useRef(null);
+  const [searchInput, setSearchInput] = useState('');
   const [songDets, setSongDets] = useState([]);
-  const [searchedSong, setSearchedSong] = useState([])
+  const [searchedSong, setSearchedSong] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const [currentSong, setCurrentSong] = useState(null)
+  const [currentSong, setCurrentSong] = useState(null);
+  const [volume, setVolume] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(true)
-  const [isBuffering, setIsBuffering] = useState(false)
-  const [searchInput, setSearchInput] = useState('')
-  const retryIntervalRef = useRef(null)
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [loop, setLoop] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
 
   const encodeId = (id) => Buffer.from(id.toString()).toString('base64');
   const decodeId = (id) => Buffer.from(id, 'base64').toString('ascii');
@@ -126,30 +128,42 @@ export default function App() {
 
   const prevSong = async () => {
     if (currentSong) {
+      let nextIndex;
       const index = suggestions.findIndex((song) => song.id === currentSong.id);
-      if (index == 0) {
-        currentSong.audio.pause();
-        const { id, name, artists, image, downloadUrl, duration } = suggestions[suggestions.length - 1];
-        await playAndPause(id, name, artists, image, downloadUrl, duration);
-      } else if (index >= 0) {
-        currentSong.audio.pause();
-        const { id, name, artists, image, downloadUrl, duration } = suggestions[index - 1];
-        await playAndPause(id, name, artists, image, downloadUrl, duration);
+      if (loop) {
+        currentSong.audio.currentTime = 0;
+        currentSong.audio.play();
+      } else {
+        if (shuffle) {
+          // In shuffle mode, the below code will pick a random song from the suggestions array
+          nextIndex = Math.floor(Math.random() * suggestions.length);
+        } else {
+          // In normal mode, play the next song in the list which is available in the suggestions array
+          nextIndex = (index == 0) ? suggestions.length - 1 : index - 1;
+        }
+        const nextSong = suggestions[nextIndex];
+        await playAndPause(nextSong.id, nextSong.name, nextSong.artists, nextSong.image, nextSong.downloadUrl, nextSong.duration);
       };
     };
   };
 
   const nextSong = async () => {
     if (currentSong) {
+      let nextIndex;
       const index = suggestions.findIndex((song) => song.id === currentSong.id);
-      if (index == suggestions.length - 1 || index == -1) {
-        currentSong.audio.pause();
-        const { id, name, artists, image, downloadUrl, duration } = suggestions[0];
-        await playAndPause(id, name, artists, image, downloadUrl, duration);
-      } else if (index >= 0) {
-        currentSong.audio.pause();
-        const { id, name, artists, image, downloadUrl, duration } = suggestions[index + 1];
-        await playAndPause(id, name, artists, image, downloadUrl, duration);
+      if (loop) {
+        currentSong.audio.currentTime = 0;
+        currentSong.audio.play();
+      } else {
+        if (shuffle) {
+          // In shuffle mode, the below code will pick a random song from the suggestions array
+          nextIndex = Math.floor(Math.random() * suggestions.length);
+        } else {
+          // In normal mode, play the next song in the list which is available in the suggestions array
+          nextIndex = (index !== -1 && index < suggestions.length - 1) ? index + 1 : 0;
+        }
+        const nextSong = suggestions[nextIndex];
+        await playAndPause(nextSong.id, nextSong.name, nextSong.artists, nextSong.image, nextSong.downloadUrl, nextSong.duration);
       };
     };
   };
@@ -178,7 +192,11 @@ export default function App() {
       setSuggestions,
       nextSong,
       prevSong,
-      getSongSuggestions
+      getSongSuggestions,
+      loop,
+      setLoop,
+      shuffle,
+      setShuffle
     }}>
       <BrowserRouter>
         <Routes>
