@@ -1,10 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import musicContext from '../context/context'
+import musicContext from '../context/context';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Player = () => {
-    const { SecToMin, isPlaying, playAndPause, volume, toggleVolume, currentSong, songDets, nextSong, prevSong} = useContext(musicContext)
+    const { SecToMin, isPlaying, playAndPause, volume, toggleVolume, currentSong, songDets, nextSong, prevSong } = useContext(musicContext)
     const progressRef = useRef(0)
     const [isSeeking, setIsSeeking] = useState(false)
+    const [timeupdate, setTimeupdate] = useState()
 
     useEffect(() => {
         if (currentSong) {
@@ -12,10 +15,11 @@ const Player = () => {
                 if (!isSeeking) {
                     const currentTime = currentSong.audio.currentTime;
                     const duration = currentSong.audio.duration;
+                    setTimeupdate(currentTime);
                     const seekBarValue = (currentTime / duration) * 100;
                     progressRef.current.value = seekBarValue;
-                }
-            }
+                };
+            };
 
             currentSong.audio.addEventListener('timeupdate', timeUpdate);
             currentSong.audio.addEventListener('ended', nextSong);
@@ -23,21 +27,22 @@ const Player = () => {
             return () => {
                 currentSong.audio.removeEventListener('timeupdate', timeUpdate);
                 currentSong.audio.removeEventListener('ended', nextSong);
-            }
-        }
+            };
+        };
 
     }, [currentSong, isSeeking])
 
     const startSeeking = () => {
         setIsSeeking(true)
-    }
+    };
 
     const continueSeeking = (e) => {
         if (isSeeking) {
             let newTime = (parseFloat(e.target.value) / 100) * currentSong.audio.duration;
             progressRef.current.value = newTime / currentSong.audio.duration * 100;
-        }
-    }
+            setTimeupdate(newTime);
+        };
+    };
 
     const endSeeking = (e) => {
         if (isSeeking) {
@@ -45,11 +50,49 @@ const Player = () => {
             let newTime = (parseFloat(e.target.value) / 100) * currentSong.audio.duration;
             currentSong.audio.currentTime = newTime;
             currentSong.audio.play();
-        }
-    }
+        };
+    };
+
+    const songDownload = async () => {
+        if (currentSong) {
+            try {
+                toast.success("Your download is starting...");
+                const response = await fetch(currentSong.audio.src);
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+
+                link.href = url;
+                link.download = `${currentSong.name}.mp3`;
+                document.body.appendChild(link);
+                link.click();
+
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+
+            } catch (error) {
+                console.error("Failed to download the song", error);
+            };
+        };
+    };
+
 
     return (
         <div className='absolute bottom-0 flex items-center h-[7rem] w-full p-4 bg-slate-300'>
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+                transition:Bounce/>
             <input type="range" ref={progressRef} onMouseDown={startSeeking} onMouseMove={continueSeeking} onMouseUp={endSeeking} onTouchStart={startSeeking} onTouchMove={continueSeeking} onTouchEnd={endSeeking} min={0} max={100} step={0.1} className='absolute top-[-5px] w-[97%] h-[13px]' />
             <div className='absolute bottom-4 flex items-center gap-4'>
                 <img src={`${songDets[0] ? songDets[0]?.image[1].url : "/playerimage.svg"}`} alt="song-image" className='h-20 w-auto object-cover' />
@@ -69,8 +112,8 @@ const Player = () => {
                 <img src="/next.svg" onClick={() => { nextSong() }} alt="next" className='h-12 cursor-pointer' />
             </div>
             <div className='absolute right-3 flex items-center w-fit h-fit gap-4'>
-                <h4>{`${SecToMin(currentSong?.audio.currentTime) + ' / ' + SecToMin(currentSong?.duration)}`}</h4>
-                <img src="/download.svg" alt="download" className='h-9 cursor-pointer' />
+                <h4>{`${SecToMin(timeupdate) + ' / ' + SecToMin(currentSong?.duration)}`}</h4>
+                <img src="/download.svg" alt="download" onClick={() => songDownload()} className='h-9 cursor-pointer' />
                 <img src={volume ? "/volume.svg" : "/mute.svg"} alt="volume" onClick={() => { toggleVolume() }} className='h-9 cursor-pointer' />
                 <input type="range" min="0" max="100" className='hidden' />
             </div>
