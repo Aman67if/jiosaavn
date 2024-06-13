@@ -123,7 +123,7 @@ export default function App() {
   const changeVolume = (e) => {
     if(currentSong){
       currentSong.audio.volume = e.target.value;
-      console.log(currentSong.audio.volume)
+      setVolume(true);
     }
   };
 
