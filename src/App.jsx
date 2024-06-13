@@ -71,10 +71,11 @@ export default function App() {
   const handleStall = (audio) => {
     if (!retryIntervalRef.current) {
       retryIntervalRef.current = setInterval(() => {
-        setIsPlaying(false);
+        setIsBuffering(true);
         if (audio.readyState >= 3) {
           audio.play().then(() => {
             setIsPlaying(true);
+            setIsBuffering(false);
             clearRetryInterval();
           }).catch((error) => console.log('Retrying to play', error));
         };
@@ -203,7 +204,8 @@ export default function App() {
       loop,
       setLoop,
       shuffle,
-      setShuffle
+      setShuffle,
+      isBuffering
     }}>
       <BrowserRouter>
         <Routes>

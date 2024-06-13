@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Player = () => {
-    const { SecToMin, isPlaying, playAndPause, volume, toggleVolume, changeVolume, currentSong, songDets, nextSong, prevSong, loop, setLoop, shuffle, setShuffle } = useContext(musicContext);
+    const { SecToMin, isPlaying, playAndPause, volume, toggleVolume, changeVolume, currentSong, songDets, nextSong, prevSong, loop, setLoop, shuffle, setShuffle, isBuffering } = useContext(musicContext);
     const progressRef = useRef(0);
     const [isSeeking, setIsSeeking] = useState(false);
     const [timeupdate, setTimeupdate] = useState(null);
@@ -120,6 +120,7 @@ const Player = () => {
                 </svg>
                 <img src="/previous.svg" onClick={() => { prevSong() }} alt="previous" className='h-12 cursor-pointer' />
                 <img src={isPlaying ? "/pause.svg" : "/play.svg"} onClick={() => { playAndPause(songDets[0].id, songDets[0].name, songDets[0].artists, songDets[0].image, songDets[0].downloadUrl, songDets[0].duration) }} alt="play" className='h-12 cursor-pointer' />
+                <img src="/loader.svg" alt="loader" className={`${isBuffering ? "visible" : "hidden"} h-[6.5rem] absolute top-[-28px] left-[6.2rem]`} />
                 <img src="/next.svg" onClick={() => { nextSong() }} alt="next" className='h-12 cursor-pointer' />
                 <svg onClick={() => songLoop()} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='h-10' color={`${loop ? "#1FCCB3" : "#000"}`} fill="none">
                     <path d="M16.3884 3L17.3913 3.97574C17.8393 4.41165 18.0633 4.62961 17.9844 4.81481C17.9056 5 17.5888 5 16.9552 5H9.19422C5.22096 5 2 8.13401 2 12C2 13.4872 2.47668 14.8662 3.2895 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
